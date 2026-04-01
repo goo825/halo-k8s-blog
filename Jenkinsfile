@@ -18,7 +18,7 @@ pipeline {
                 sh '''
                 if [ -d assets ]; then
                   kubectl exec -n blog-system ${HALO_POD} -- mkdir -p /root/.halo2/assets
-                  kubectl cp assets blog-system/${HALO_POD}:/root/.halo2/assets
+                  kubectl cp assets/. blog-system/${HALO_POD}:/root/.halo2/assets
                 else
                   echo "No assets directory found, skipping asset sync."
                 fi
