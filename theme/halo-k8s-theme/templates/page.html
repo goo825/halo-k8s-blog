@@ -5,9 +5,9 @@
 >
   <th:block th:fragment="content">
     <article class="content-card prose article-shell">
-      <a class="back-link" href="/">Back to home</a>
-      <p class="eyebrow">Page</p>
-      <h1 th:text="${singlePage.spec.title}">Page title</h1>
+      <a class="back-link" href="/">返回首页</a>
+      <p class="eyebrow">页面</p>
+      <h1 th:text="${singlePage.spec.title}">页面标题</h1>
       <div class="article-body" th:utext="${singlePage.content.content}"></div>
     </article>
   </th:block>

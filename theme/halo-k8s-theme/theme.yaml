@@ -3,18 +3,18 @@ kind: Theme
 metadata:
   name: halo-k8s-theme
 spec:
-  displayName: Halo K8s Theme
+  displayName: Halo K8s 中文主题
   author:
     name: goo825
     website: "https://github.com/goo825"
-  description: Minimal Halo theme package for K8s and Jenkins CI/CD demos.
+  description: 面向 K8s 与 Jenkins CI/CD 演示场景的 Halo 中文主题包。
   logo: "https://www.halo.run/logo"
   homepage: "https://github.com/goo825/halo-k8s-blog"
   repo: "https://github.com/goo825/halo-k8s-blog"
   issues: "https://github.com/goo825/halo-k8s-blog/issues"
   settingName: "halo-k8s-theme-setting"
   configMapName: "halo-k8s-theme-config"
-  version: "0.2.0"
+  version: "0.2.1"
   requires: ">=2.0.0"
   license:
     - name: "MIT"

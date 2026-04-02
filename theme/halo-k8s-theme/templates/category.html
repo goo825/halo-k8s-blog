@@ -5,12 +5,12 @@
 >
   <th:block th:fragment="content">
     <section class="content-card">
-      <p class="eyebrow">Category</p>
-      <h1 th:text="${category.spec.displayName}">Category</h1>
+      <p class="eyebrow">分类</p>
+      <h1 th:text="${category.spec.displayName}">分类名称</h1>
       <ul class="post-list">
         <li th:each="post : ${posts.items}">
           <a th:href="@{${post.status.permalink}}" th:text="${post.spec.title}">
-            Post
+            文章
           </a>
         </li>
       </ul>

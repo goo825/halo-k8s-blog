@@ -5,11 +5,11 @@
 >
   <th:block th:fragment="content">
     <section class="content-card">
-      <p class="eyebrow">Taxonomy</p>
-      <h1>Tags</h1>
+      <p class="eyebrow">标签</p>
+      <h1>全部标签</h1>
       <ul class="post-list">
         <li th:each="tag : ${tags.items}" th:text="${tag.spec.displayName}">
-          Tag
+          标签
         </li>
       </ul>
     </section>

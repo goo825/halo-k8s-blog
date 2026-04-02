@@ -6,45 +6,42 @@
   <th:block th:fragment="content">
     <section class="content-card section-heading">
       <div>
-        <p class="eyebrow">Recent publishing</p>
-        <h2>Latest posts</h2>
+        <p class="eyebrow">最新发布</p>
+        <h2>最近文章</h2>
       </div>
       <p class="section-copy">
-        The list below is rendered by Halo and styled by the repository-managed
-        theme package.
+        下方内容由 Halo 动态渲染，并由仓库中维护的主题资源包统一控制前台样式。
       </p>
     </section>
 
     <section class="post-grid">
       <article class="post-card" th:each="post : ${posts.items}">
-        <p class="card-kicker">Post</p>
+        <p class="card-kicker">文章</p>
         <h3>
           <a th:href="@{${post.status.permalink}}" th:text="${post.spec.title}">
-            Sample post
+            示例文章
           </a>
         </h3>
         <p class="card-copy">
-          Open the article to view the full Halo content page rendered by this
-          theme.
+          打开文章即可查看由当前主题渲染的完整内容页面。
         </p>
-        <a class="text-link" th:href="@{${post.status.permalink}}">Read article</a>
+        <a class="text-link" th:href="@{${post.status.permalink}}">阅读文章</a>
       </article>
     </section>
 
     <section class="content-card empty-state" th:if="${#lists.isEmpty(posts.items)}">
-      <h3>No posts yet</h3>
+      <h3>暂时还没有文章</h3>
       <p>
-        Publish your first Halo article and it will appear here automatically
-        after the theme is enabled.
+        当你在 Halo 中发布第一篇文章后，它会自动显示在这里。
       </p>
     </section>
 
     <div class="pager content-card">
       <a class="button button-secondary" th:if="${posts.hasPrevious()}" th:href="@{${posts.prevUrl}}">
-        Previous
+        上一页
       </a>
       <a class="button button-primary" th:if="${posts.hasNext()}" th:href="@{${posts.nextUrl}}">
-        Next
+        下一页
       </a>
     </div>
   </th:block>

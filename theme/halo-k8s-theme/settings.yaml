@@ -5,33 +5,33 @@ metadata:
 spec:
   forms:
     - group: appearance
-      label: Appearance
+      label: 外观
       formSchema:
         - $formkit: color
           name: accent_color
-          label: Accent color
+          label: 主题色
           value: "#2563eb"
         - $formkit: text
           name: hero_title
-          label: Hero title
-          value: "Halo on Kubernetes"
+          label: 首页主标题
+          value: "基于 Kubernetes 的 Halo 博客系统"
         - $formkit: textarea
           name: hero_description
-          label: Hero description
-          value: "This theme is published by Jenkins and loaded by Halo through the theme mechanism."
+          label: 首页说明
+          value: "该主题由 Jenkins 自动发布，并通过 Halo 的主题机制加载到博客前台。"
         - $formkit: text
           name: status_label
-          label: Status label
-          value: "CI/CD Online"
+          label: 状态标签
+          value: "CI/CD 已上线"
         - $formkit: text
           name: feature_one
-          label: Feature one
-          value: "Kubernetes orchestration"
+          label: 特性一
+          value: "Kubernetes 容器编排"
         - $formkit: text
           name: feature_two
-          label: Feature two
-          value: "Jenkins automated delivery"
+          label: 特性二
+          value: "Jenkins 自动化发布"
         - $formkit: text
           name: feature_three
-          label: Feature three
-          value: "Halo content management"
+          label: 特性三
+          value: "Halo 内容管理"

@@ -11,7 +11,7 @@
       name="viewport"
       content="width=device-width, initial-scale=1, maximum-scale=2"
     />
-    <title th:text="${site.title}">Halo K8s Theme</title>
+    <title th:text="${site.title}">Halo K8s 中文主题</title>
     <link
       rel="stylesheet"
       th:href="@{/assets/css/style.css?v={version}(version=${theme.spec.version})}"
@@ -34,14 +34,14 @@
           <span class="brand-dot"></span>
           <span>
             <strong th:text="${site.title}">Halo Blog</strong>
-            <small>Published by Jenkins</small>
+            <small>由 Jenkins 自动发布</small>
           </span>
         </a>
         <nav class="top-nav" aria-label="Primary">
-          <a href="/">Home</a>
-          <a href="/archives">Archives</a>
-          <a href="/categories">Categories</a>
-          <a href="/tags">Tags</a>
+          <a href="/">首页</a>
+          <a href="/archives">归档</a>
+          <a href="/categories">分类</a>
+          <a href="/tags">标签</a>
         </nav>
       </div>
       <div class="hero-card">
@@ -49,47 +49,46 @@
           <section class="hero-copy-block">
             <p class="eyebrow">Halo + K8s + Jenkins</p>
             <h1 th:text="${theme.config.appearance.hero_title ?: site.title}">
-              Halo on Kubernetes
+              基于 Kubernetes 的 Halo 博客系统
             </h1>
             <p
               class="hero-copy"
               th:text="${theme.config.appearance.hero_description ?: site.subtitle}"
             >
-              This theme is published by Jenkins and loaded by Halo through the
-              theme mechanism.
+              该主题由 Jenkins 自动发布，并通过 Halo 的主题机制加载到博客前台。
             </p>
             <div class="hero-actions">
-              <a class="button button-primary" href="/">Browse posts</a>
-              <a class="button button-secondary" href="/archives">View archive</a>
+              <a class="button button-primary" href="/">查看文章</a>
+              <a class="button button-secondary" href="/archives">查看归档</a>
             </div>
           </section>
           <aside class="hero-panel">
             <p
               class="status-pill"
-              th:text="${theme.config.appearance.status_label ?: 'CI/CD Online'}"
+              th:text="${theme.config.appearance.status_label ?: 'CI/CD 已上线'}"
             >
-              CI/CD Online
+              CI/CD 已上线
             </p>
             <ul class="feature-list">
               <li
-                th:text="${theme.config.appearance.feature_one ?: 'Kubernetes orchestration'}"
+                th:text="${theme.config.appearance.feature_one ?: 'Kubernetes 容器编排'}"
               >
-                Kubernetes orchestration
+                Kubernetes 容器编排
               </li>
               <li
-                th:text="${theme.config.appearance.feature_two ?: 'Jenkins automated delivery'}"
+                th:text="${theme.config.appearance.feature_two ?: 'Jenkins 自动化发布'}"
               >
-                Jenkins automated delivery
+                Jenkins 自动化发布
               </li>
               <li
-                th:text="${theme.config.appearance.feature_three ?: 'Halo content management'}"
+                th:text="${theme.config.appearance.feature_three ?: 'Halo 内容管理'}"
               >
-                Halo content management
+                Halo 内容管理
               </li>
             </ul>
             <p class="hero-meta">
-              Active theme:
-              <strong th:text="${theme.spec.displayName}">Halo K8s Theme</strong>
+              当前主题：
+              <strong th:text="${theme.spec.displayName}">Halo K8s 中文主题</strong>
             </p>
           </aside>
         </div>
@@ -100,11 +99,11 @@
     </main>
     <footer class="site-shell site-footer">
       <p>
-        <span th:text="${site.title}">Halo Blog</span>
+        <span th:text="${site.title}">Halo 博客</span>
         <span class="footer-sep">/</span>
-        Delivered through GitHub, Jenkins and Kubernetes
+        基于 GitHub、Jenkins 与 Kubernetes 自动交付
       </p>
-      <p id="build-year">Theme package active</p>
+      <p id="build-year">主题包已启用</p>
     </footer>
   </body>
 </html>

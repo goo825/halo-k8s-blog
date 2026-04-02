@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
   const footerYear = document.getElementById("build-year");
   if (footerYear) {
-    footerYear.textContent = `Theme package active in ${new Date().getFullYear()}`;
+    footerYear.textContent = `主题包已启用 ${new Date().getFullYear()}`;
   }
 });
