@@ -9,6 +9,7 @@ Kubernetes-based Halo blog system with Jenkins CI/CD.
 - `k8s/mysql`: MySQL manifests
 - `k8s/halo`: Halo manifests
 - `k8s/cicd/jenkins`: Jenkins manifests
+- `k8s/monitoring`: Prometheus and Grafana monitoring manifests
 
 ## Current Scope
 
@@ -18,6 +19,8 @@ Kubernetes-based Halo blog system with Jenkins CI/CD.
 - Jenkins scheduled on `k8s-master-03`
 - Jenkins updates Halo automatically through Kubernetes rollout
 - Jenkins publishes the repository theme into `/root/.halo2/themes/halo-k8s-theme`
+- Prometheus and Grafana are scheduled on `k8s-master-03`
+- node-exporter runs on all nodes to collect host metrics
 
 ## Theme Publish
 
