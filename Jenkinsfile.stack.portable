@@ -8,10 +8,15 @@ pipeline {
     stages {
         stage('Validate Input') {
             steps {
+                script {
+                    env.RESOLVED_STACK_FILE = (params.STACK_FILE?.trim())
+                        ? params.STACK_FILE.trim()
+                        : 'k8s/stacks/blog-stack-portable.yaml'
+                }
                 sh '''
                 set -e
-                test -f "${STACK_FILE}"
-                echo "Deploying stack file: ${STACK_FILE}"
+                test -f "${RESOLVED_STACK_FILE}"
+                echo "Deploying stack file: ${RESOLVED_STACK_FILE}"
                 '''
             }
         }
@@ -19,7 +24,7 @@ pipeline {
         stage('Apply Stack') {
             steps {
                 sh '''
-                kubectl apply -f "${STACK_FILE}"
+                kubectl apply -f "${RESOLVED_STACK_FILE}"
                 '''
             }
         }
@@ -28,7 +33,7 @@ pipeline {
             steps {
                 sh '''
                 set -e
-                case "${STACK_FILE}" in
+                case "${RESOLVED_STACK_FILE}" in
                   k8s/stacks/blog-stack-portable.yaml)
                     kubectl rollout status statefulset/mysql -n blog-system --timeout=300s
                     kubectl rollout status deployment/halo -n blog-system --timeout=300s
@@ -43,7 +48,7 @@ pipeline {
                     kubectl rollout status daemonset/node-exporter -n monitoring-system --timeout=300s
                     ;;
                   *)
-                    echo "No built-in rollout checks for ${STACK_FILE}"
+                    echo "No built-in rollout checks for ${RESOLVED_STACK_FILE}"
                     ;;
                 esac
                 '''
@@ -53,7 +58,7 @@ pipeline {
         stage('Show Access Hints') {
             steps {
                 sh '''
-                case "${STACK_FILE}" in
+                case "${RESOLVED_STACK_FILE}" in
                   k8s/stacks/blog-stack-portable.yaml)
                     kubectl get svc -n blog-system
                     echo "Use: kubectl -n blog-system port-forward svc/halo 8090:8090"
