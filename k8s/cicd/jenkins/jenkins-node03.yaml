@@ -37,14 +37,28 @@ metadata:
   name: jenkins-deployer
 rules:
   - apiGroups: [""]
-    resources: ["pods", "services"]
-    verbs: ["get", "list", "watch"]
+    resources:
+      - namespaces
+      - pods
+      - pods/log
+      - services
+      - serviceaccounts
+      - configmaps
+      - persistentvolumes
+      - persistentvolumeclaims
+    verbs: ["get", "list", "watch", "create", "update", "patch"]
   - apiGroups: [""]
     resources: ["pods/exec"]
     verbs: ["create"]
   - apiGroups: ["apps"]
-    resources: ["deployments"]
-    verbs: ["get", "list", "watch", "patch", "update"]
+    resources: ["deployments", "daemonsets", "replicasets"]
+    verbs: ["get", "list", "watch", "create", "update", "patch"]
+  - apiGroups: ["batch"]
+    resources: ["jobs"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  - apiGroups: ["rbac.authorization.k8s.io"]
+    resources: ["clusterroles", "clusterrolebindings"]
+    verbs: ["get", "list", "watch", "create", "update", "patch"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
