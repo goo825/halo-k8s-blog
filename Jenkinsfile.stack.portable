@@ -1,0 +1,80 @@
+pipeline {
+    agent any
+
+    parameters {
+        string(name: 'STACK_FILE', defaultValue: 'k8s/stacks/blog-stack-portable.yaml', description: 'Stack manifest to deploy')
+    }
+
+    stages {
+        stage('Validate Input') {
+            steps {
+                sh '''
+                set -e
+                test -f "${STACK_FILE}"
+                echo "Deploying stack file: ${STACK_FILE}"
+                '''
+            }
+        }
+
+        stage('Apply Stack') {
+            steps {
+                sh '''
+                kubectl apply -f "${STACK_FILE}"
+                '''
+            }
+        }
+
+        stage('Wait For Workloads') {
+            steps {
+                sh '''
+                set -e
+                case "${STACK_FILE}" in
+                  k8s/stacks/blog-stack-portable.yaml)
+                    kubectl rollout status statefulset/mysql -n blog-system --timeout=300s
+                    kubectl rollout status deployment/halo -n blog-system --timeout=300s
+                    ;;
+                  k8s/stacks/jenkins-stack-portable.yaml)
+                    kubectl rollout status deployment/jenkins -n cicd-system --timeout=300s
+                    ;;
+                  k8s/stacks/monitoring-stack-portable.yaml)
+                    kubectl rollout status deployment/prometheus -n monitoring-system --timeout=300s
+                    kubectl rollout status deployment/grafana -n monitoring-system --timeout=300s
+                    kubectl rollout status deployment/kube-state-metrics -n monitoring-system --timeout=300s
+                    kubectl rollout status daemonset/node-exporter -n monitoring-system --timeout=300s
+                    ;;
+                  *)
+                    echo "No built-in rollout checks for ${STACK_FILE}"
+                    ;;
+                esac
+                '''
+            }
+        }
+
+        stage('Show Access Hints') {
+            steps {
+                sh '''
+                case "${STACK_FILE}" in
+                  k8s/stacks/blog-stack-portable.yaml)
+                    kubectl get svc -n blog-system
+                    echo "Use: kubectl -n blog-system port-forward svc/halo 8090:8090"
+                    echo "Then open: http://127.0.0.1:8090"
+                    ;;
+                  k8s/stacks/jenkins-stack-portable.yaml)
+                    kubectl get svc -n cicd-system
+                    echo "Use: kubectl -n cicd-system port-forward svc/jenkins 8080:8080"
+                    echo "Then open: http://127.0.0.1:8080"
+                    echo "Jenkins login: admin / admin"
+                    ;;
+                  k8s/stacks/monitoring-stack-portable.yaml)
+                    kubectl get svc -n monitoring-system
+                    echo "Use: kubectl -n monitoring-system port-forward svc/prometheus 9090:9090"
+                    echo "Use: kubectl -n monitoring-system port-forward svc/grafana 3000:3000"
+                    echo "Grafana login: admin / admin"
+                    echo "Apply k8s/monitoring/grafana-smtp-secret.qq.example.yaml only if email alerting is needed."
+                    ;;
+                esac
+                '''
+            }
+        }
+    }
+}

@@ -1,0 +1,44 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Prepare Monitoring Namespace') {
+            steps {
+                sh '''
+                kubectl create namespace monitoring-system --dry-run=client -o yaml | kubectl apply -f -
+                '''
+            }
+        }
+
+        stage('Deploy Monitoring Core') {
+            steps {
+                sh '''
+                kubectl apply -f k8s/monitoring/prometheus-grafana-portable.yaml
+                kubectl rollout status deployment/prometheus -n monitoring-system --timeout=300s
+                kubectl rollout status deployment/grafana -n monitoring-system --timeout=300s
+                kubectl rollout status deployment/kube-state-metrics -n monitoring-system --timeout=300s
+                '''
+            }
+        }
+
+        stage('Deploy Node Exporter') {
+            steps {
+                sh '''
+                kubectl apply -f k8s/monitoring/node-exporter.yaml
+                '''
+            }
+        }
+
+        stage('Show Access Hint') {
+            steps {
+                sh '''
+                kubectl get svc -n monitoring-system
+                echo "Use: kubectl -n monitoring-system port-forward svc/prometheus 9090:9090"
+                echo "Use: kubectl -n monitoring-system port-forward svc/grafana 3000:3000"
+                echo "Grafana login: admin / admin"
+                echo "Apply k8s/monitoring/grafana-smtp-secret.qq.example.yaml only if email alerting is needed."
+                '''
+            }
+        }
+    }
+}

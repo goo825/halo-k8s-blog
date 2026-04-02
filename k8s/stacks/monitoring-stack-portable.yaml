@@ -169,35 +169,11 @@ data:
         editable: true
 ---
 apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: prometheus-pv-node03
-spec:
-  capacity:
-    storage: 10Gi
-  volumeMode: Filesystem
-  accessModes:
-    - ReadWriteOnce
-  persistentVolumeReclaimPolicy: Retain
-  storageClassName: ""
-  local:
-    path: /data/prometheus
-  nodeAffinity:
-    required:
-      nodeSelectorTerms:
-        - matchExpressions:
-            - key: kubernetes.io/hostname
-              operator: In
-              values:
-                - k8s-master-03
----
-apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: prometheus-pvc
   namespace: monitoring-system
 spec:
-  storageClassName: ""
   accessModes:
     - ReadWriteOnce
   resources:
@@ -205,35 +181,11 @@ spec:
       storage: 10Gi
 ---
 apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: grafana-pv-node03
-spec:
-  capacity:
-    storage: 5Gi
-  volumeMode: Filesystem
-  accessModes:
-    - ReadWriteOnce
-  persistentVolumeReclaimPolicy: Retain
-  storageClassName: ""
-  local:
-    path: /data/grafana
-  nodeAffinity:
-    required:
-      nodeSelectorTerms:
-        - matchExpressions:
-            - key: kubernetes.io/hostname
-              operator: In
-              values:
-                - k8s-master-03
----
-apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: grafana-pvc
   namespace: monitoring-system
 spec:
-  storageClassName: ""
   accessModes:
     - ReadWriteOnce
   resources:
@@ -256,8 +208,6 @@ spec:
         app: prometheus
     spec:
       serviceAccountName: prometheus
-      nodeSelector:
-        kubernetes.io/hostname: k8s-master-03
       tolerations:
         - key: "node-role.kubernetes.io/master"
           operator: "Exists"
@@ -299,14 +249,13 @@ metadata:
   name: prometheus
   namespace: monitoring-system
 spec:
-  type: NodePort
+  type: ClusterIP
   selector:
     app: prometheus
   ports:
     - name: web
       port: 9090
       targetPort: 9090
-      nodePort: 30900
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -323,8 +272,6 @@ spec:
       labels:
         app: grafana
     spec:
-      nodeSelector:
-        kubernetes.io/hostname: k8s-master-03
       tolerations:
         - key: "node-role.kubernetes.io/master"
           operator: "Exists"
@@ -373,14 +320,13 @@ metadata:
   name: grafana
   namespace: monitoring-system
 spec:
-  type: NodePort
+  type: ClusterIP
   selector:
     app: grafana
   ports:
     - name: web
       port: 3000
       targetPort: 3000
-      nodePort: 30901
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -398,8 +344,6 @@ spec:
         app: kube-state-metrics
     spec:
       serviceAccountName: kube-state-metrics
-      nodeSelector:
-        kubernetes.io/hostname: k8s-master-03
       tolerations:
         - key: "node-role.kubernetes.io/master"
           operator: "Exists"
@@ -431,3 +375,80 @@ spec:
     - name: http-metrics
       port: 8080
       targetPort: 8080
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: node-exporter
+  namespace: monitoring-system
+spec:
+  selector:
+    matchLabels:
+      app: node-exporter
+  template:
+    metadata:
+      labels:
+        app: node-exporter
+    spec:
+      hostNetwork: true
+      hostPID: true
+      tolerations:
+        - key: "node-role.kubernetes.io/master"
+          operator: "Exists"
+          effect: "NoSchedule"
+      containers:
+        - name: node-exporter
+          image: prom/node-exporter:v1.8.2
+          imagePullPolicy: IfNotPresent
+          args:
+            - --path.procfs=/host/proc
+            - --path.sysfs=/host/sys
+            - --path.rootfs=/host/root
+            - --collector.filesystem.mount-points-exclude=^/(dev|proc|sys|var/lib/docker/.+|var/lib/kubelet/.+)($|/)
+          ports:
+            - containerPort: 9100
+              hostPort: 9100
+              name: metrics
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "64Mi"
+            limits:
+              cpu: "100m"
+              memory: "128Mi"
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - name: proc
+              mountPath: /host/proc
+              readOnly: true
+            - name: sys
+              mountPath: /host/sys
+              readOnly: true
+            - name: root
+              mountPath: /host/root
+              readOnly: true
+      volumes:
+        - name: proc
+          hostPath:
+            path: /proc
+        - name: sys
+          hostPath:
+            path: /sys
+        - name: root
+          hostPath:
+            path: /
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: node-exporter
+  namespace: monitoring-system
+spec:
+  clusterIP: None
+  selector:
+    app: node-exporter
+  ports:
+    - name: metrics
+      port: 9100
+      targetPort: 9100

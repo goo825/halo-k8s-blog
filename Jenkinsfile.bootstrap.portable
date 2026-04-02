@@ -1,0 +1,33 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Deploy MySQL') {
+            steps {
+                sh '''
+                kubectl apply -f k8s/mysql/mysql-portable.yaml
+                kubectl rollout status statefulset/mysql -n blog-system --timeout=300s
+                '''
+            }
+        }
+
+        stage('Deploy Halo') {
+            steps {
+                sh '''
+                kubectl apply -f k8s/halo/halo-portable.yaml
+                kubectl rollout status deployment/halo -n blog-system --timeout=300s
+                '''
+            }
+        }
+
+        stage('Show Access Hint') {
+            steps {
+                sh '''
+                kubectl get svc -n blog-system
+                echo "Use: kubectl -n blog-system port-forward svc/halo 8090:8090"
+                echo "Then open: http://127.0.0.1:8090"
+                '''
+            }
+        }
+    }
+}

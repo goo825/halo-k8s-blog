@@ -1,0 +1,246 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: blog-system
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mysql-secret
+  namespace: blog-system
+type: Opaque
+stringData:
+  MYSQL_ROOT_PASSWORD: "admin"
+  MYSQL_DATABASE: "halo"
+  MYSQL_USER: "halo"
+  MYSQL_PASSWORD: "admin"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-config
+  namespace: blog-system
+data:
+  my.cnf: |
+    [mysqld]
+    character-set-server=utf8mb4
+    collation-server=utf8mb4_unicode_ci
+    default-authentication-plugin=mysql_native_password
+    skip-name-resolve
+    max_connections=200
+    innodb_buffer_pool_size=256M
+    sql_mode=STRICT_TRANS_TABLES,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: halo-config
+  namespace: blog-system
+data:
+  HALO_EXTERNAL_URL: "http://localhost:8090"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-pvc
+  namespace: blog-system
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: halo-pvc
+  namespace: blog-system
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+  namespace: blog-system
+spec:
+  selector:
+    app: mysql
+  ports:
+    - name: mysql
+      port: 3306
+      targetPort: 3306
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: halo
+  namespace: blog-system
+spec:
+  selector:
+    app: halo
+  ports:
+    - name: http
+      port: 8090
+      targetPort: 8090
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mysql
+  namespace: blog-system
+spec:
+  serviceName: mysql
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - name: mysql-data
+          persistentVolumeClaim:
+            claimName: mysql-pvc
+        - name: mysql-config
+          configMap:
+            name: mysql-config
+      containers:
+        - name: mysql
+          image: mysql:8.0.36
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3306
+              name: mysql
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: MYSQL_ROOT_PASSWORD
+            - name: MYSQL_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: MYSQL_DATABASE
+            - name: MYSQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: MYSQL_USER
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: MYSQL_PASSWORD
+          resources:
+            requests:
+              cpu: "300m"
+              memory: "512Mi"
+            limits:
+              cpu: "1000m"
+              memory: "1536Mi"
+          livenessProbe:
+            tcpSocket:
+              port: 3306
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            timeoutSeconds: 5
+          readinessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - mysqladmin ping -h 127.0.0.1 -uroot -p"${MYSQL_ROOT_PASSWORD}"
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            timeoutSeconds: 5
+          volumeMounts:
+            - name: mysql-data
+              mountPath: /var/lib/mysql
+            - name: mysql-config
+              mountPath: /etc/mysql/conf.d
+  updateStrategy:
+    type: RollingUpdate
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: halo
+  namespace: blog-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: halo
+  template:
+    metadata:
+      labels:
+        app: halo
+    spec:
+      tolerations:
+        - key: "node-role.kubernetes.io/master"
+          operator: "Exists"
+          effect: "NoSchedule"
+      volumes:
+        - name: halo-data
+          persistentVolumeClaim:
+            claimName: halo-pvc
+      containers:
+        - name: halo
+          image: registry.fit2cloud.com/halo/halo:2.21
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8090
+              name: http
+          env:
+            - name: JVM_OPTS
+              value: "-Xms256m -Xmx512m"
+            - name: HALO_WORK_DIR
+              value: /root/.halo2
+            - name: HALO_EXTERNAL_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: halo-config
+                  key: HALO_EXTERNAL_URL
+            - name: MYSQL_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: MYSQL_DATABASE
+            - name: MYSQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: MYSQL_USER
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: MYSQL_PASSWORD
+          args:
+            - --spring.r2dbc.url=r2dbc:pool:mysql://mysql.blog-system.svc.cluster.local:3306/$(MYSQL_DATABASE)
+            - --spring.r2dbc.username=$(MYSQL_USER)
+            - --spring.r2dbc.password=$(MYSQL_PASSWORD)
+            - --spring.sql.init.platform=mysql
+            - --halo.external-url=$(HALO_EXTERNAL_URL)
+          resources:
+            requests:
+              cpu: "200m"
+              memory: "512Mi"
+            limits:
+              cpu: "1000m"
+              memory: "1024Mi"
+          volumeMounts:
+            - name: halo-data
+              mountPath: /root/.halo2
