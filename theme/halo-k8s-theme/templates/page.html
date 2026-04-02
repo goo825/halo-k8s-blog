@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="https://www.thymeleaf.org"
+  th:replace="~{layout :: html(head = null,content = ~{::content})}"
+>
+  <th:block th:fragment="content">
+    <article class="content-card prose article-shell">
+      <a class="back-link" href="/">Back to home</a>
+      <p class="eyebrow">Page</p>
+      <h1 th:text="${singlePage.spec.title}">Page title</h1>
+      <div class="article-body" th:utext="${singlePage.content.content}"></div>
+    </article>
+  </th:block>
+</html>

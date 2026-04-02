@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="https://www.thymeleaf.org"
+  th:replace="~{layout :: html(head = null,content = ~{::content})}"
+>
+  <th:block th:fragment="content">
+    <section class="content-card">
+      <p class="eyebrow">Archive</p>
+      <h1>Archives</h1>
+      <p class="section-copy">
+        This theme package is managed in GitHub and published through Jenkins.
+      </p>
+    </section>
+  </th:block>
+</html>

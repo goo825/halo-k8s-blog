@@ -1,0 +1,37 @@
+apiVersion: v1alpha1
+kind: Setting
+metadata:
+  name: halo-k8s-theme-setting
+spec:
+  forms:
+    - group: appearance
+      label: Appearance
+      formSchema:
+        - $formkit: color
+          name: accent_color
+          label: Accent color
+          value: "#2563eb"
+        - $formkit: text
+          name: hero_title
+          label: Hero title
+          value: "Halo on Kubernetes"
+        - $formkit: textarea
+          name: hero_description
+          label: Hero description
+          value: "This theme is published by Jenkins and loaded by Halo through the theme mechanism."
+        - $formkit: text
+          name: status_label
+          label: Status label
+          value: "CI/CD Online"
+        - $formkit: text
+          name: feature_one
+          label: Feature one
+          value: "Kubernetes orchestration"
+        - $formkit: text
+          name: feature_two
+          label: Feature two
+          value: "Jenkins automated delivery"
+        - $formkit: text
+          name: feature_three
+          label: Feature three
+          value: "Halo content management"

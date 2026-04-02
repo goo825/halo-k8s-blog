@@ -13,15 +13,19 @@ pipeline {
             }
         }
 
-        stage('Sync Assets') {
+        stage('Publish Theme Package') {
             steps {
                 sh '''
-                if [ -d assets ]; then
-                  kubectl exec -n blog-system ${HALO_POD} -- mkdir -p /root/.halo2/assets
-                  kubectl exec -n blog-system ${HALO_POD} -- rm -rf /root/.halo2/assets/*
-                  tar -cf - -C assets . | kubectl exec -i -n blog-system ${HALO_POD} -- tar -xf - -C /root/.halo2/assets
+                THEME_NAME=halo-k8s-theme
+                THEME_DIR=theme/${THEME_NAME}
+                TARGET_DIR=/root/.halo2/themes/${THEME_NAME}
+
+                if [ -d "${THEME_DIR}" ]; then
+                  kubectl exec -n blog-system ${HALO_POD} -- mkdir -p "${TARGET_DIR}"
+                  kubectl exec -n blog-system ${HALO_POD} -- sh -c "rm -rf ${TARGET_DIR}/*"
+                  tar -cf - -C "${THEME_DIR}" . | kubectl exec -i -n blog-system ${HALO_POD} -- tar -xf - -C "${TARGET_DIR}"
                 else
-                  echo "No assets directory found, skipping asset sync."
+                  echo "No theme package found at ${THEME_DIR}, skipping theme publish."
                 fi
                 '''
             }

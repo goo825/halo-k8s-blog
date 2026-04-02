@@ -1,0 +1,110 @@
+<!doctype html>
+<html
+  lang="en"
+  xmlns:th="https://www.thymeleaf.org"
+  th:fragment="html (head,content)"
+>
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=2"
+    />
+    <title th:text="${site.title}">Halo K8s Theme</title>
+    <link
+      rel="stylesheet"
+      th:href="@{/assets/css/style.css?v={version}(version=${theme.spec.version})}"
+    />
+    <script
+      th:src="@{/assets/js/main.js?v={version}(version=${theme.spec.version})}"
+      defer
+    ></script>
+    <th:block th:if="${head != null}">
+      <th:block th:replace="${head}" />
+    </th:block>
+  </head>
+  <body
+    th:style="'--accent-color: ' + (${theme.config.appearance.accent_color} ?: '#2563eb')"
+  >
+    <div class="backdrop"></div>
+    <header class="site-shell site-header">
+      <div class="brand-row">
+        <a class="brand-mark" href="/">
+          <span class="brand-dot"></span>
+          <span>
+            <strong th:text="${site.title}">Halo Blog</strong>
+            <small>Published by Jenkins</small>
+          </span>
+        </a>
+        <nav class="top-nav" aria-label="Primary">
+          <a href="/">Home</a>
+          <a href="/archives">Archives</a>
+          <a href="/categories">Categories</a>
+          <a href="/tags">Tags</a>
+        </nav>
+      </div>
+      <div class="hero-card">
+        <div class="hero-grid">
+          <section class="hero-copy-block">
+            <p class="eyebrow">Halo + K8s + Jenkins</p>
+            <h1 th:text="${theme.config.appearance.hero_title ?: site.title}">
+              Halo on Kubernetes
+            </h1>
+            <p
+              class="hero-copy"
+              th:text="${theme.config.appearance.hero_description ?: site.subtitle}"
+            >
+              This theme is published by Jenkins and loaded by Halo through the
+              theme mechanism.
+            </p>
+            <div class="hero-actions">
+              <a class="button button-primary" href="/">Browse posts</a>
+              <a class="button button-secondary" href="/archives">View archive</a>
+            </div>
+          </section>
+          <aside class="hero-panel">
+            <p
+              class="status-pill"
+              th:text="${theme.config.appearance.status_label ?: 'CI/CD Online'}"
+            >
+              CI/CD Online
+            </p>
+            <ul class="feature-list">
+              <li
+                th:text="${theme.config.appearance.feature_one ?: 'Kubernetes orchestration'}"
+              >
+                Kubernetes orchestration
+              </li>
+              <li
+                th:text="${theme.config.appearance.feature_two ?: 'Jenkins automated delivery'}"
+              >
+                Jenkins automated delivery
+              </li>
+              <li
+                th:text="${theme.config.appearance.feature_three ?: 'Halo content management'}"
+              >
+                Halo content management
+              </li>
+            </ul>
+            <p class="hero-meta">
+              Active theme:
+              <strong th:text="${theme.spec.displayName}">Halo K8s Theme</strong>
+            </p>
+          </aside>
+        </div>
+      </div>
+    </header>
+    <main class="site-shell site-main">
+      <th:block th:replace="${content}" />
+    </main>
+    <footer class="site-shell site-footer">
+      <p>
+        <span th:text="${site.title}">Halo Blog</span>
+        <span class="footer-sep">/</span>
+        Delivered through GitHub, Jenkins and Kubernetes
+      </p>
+      <p id="build-year">Theme package active</p>
+    </footer>
+  </body>
+</html>

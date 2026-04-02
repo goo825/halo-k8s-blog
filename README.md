@@ -5,7 +5,7 @@ Kubernetes-based Halo blog system with Jenkins CI/CD.
 ## Structure
 
 - `Jenkinsfile`: Jenkins pipeline definition
-- `assets`: static assets synchronized into Halo work directory
+- `theme/halo-k8s-theme`: repository-managed Halo theme package
 - `k8s/mysql`: MySQL manifests
 - `k8s/halo`: Halo manifests
 - `k8s/cicd/jenkins`: Jenkins manifests
@@ -17,9 +17,10 @@ Kubernetes-based Halo blog system with Jenkins CI/CD.
 - Halo scheduled on `k8s-master-01`
 - Jenkins scheduled on `k8s-master-03`
 - Jenkins updates Halo automatically through Kubernetes rollout
-- Jenkins synchronizes repository assets into `/root/.halo2/assets`
+- Jenkins publishes the repository theme into `/root/.halo2/themes/halo-k8s-theme`
 
-## Assets Sync
+## Theme Publish
 
-Static files stored under `assets/` are copied into the Halo pod at `/root/.halo2/assets` during the Jenkins pipeline.
-This is suitable for managed images, CSS files, and other repository-driven frontend resources.
+The repository includes a minimal Halo theme package under `theme/halo-k8s-theme`.
+During the Jenkins pipeline, this directory is copied into the Halo pod at `/root/.halo2/themes/halo-k8s-theme`.
+After the first publish, enable the `halo-k8s-theme` theme in the Halo admin console so later Git commits can update frontend templates and styles through Jenkins.

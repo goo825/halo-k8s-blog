@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="https://www.thymeleaf.org"
+  th:replace="~{layout :: html(head = null,content = ~{::content})}"
+>
+  <th:block th:fragment="content">
+    <section class="content-card">
+      <p class="eyebrow">Taxonomy</p>
+      <h1>Tags</h1>
+      <ul class="post-list">
+        <li th:each="tag : ${tags.items}" th:text="${tag.spec.displayName}">
+          Tag
+        </li>
+      </ul>
+    </section>
+  </th:block>
+</html>

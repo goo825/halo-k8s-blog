@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="https://www.thymeleaf.org"
+  th:replace="~{layout :: html(head = null,content = ~{::content})}"
+>
+  <th:block th:fragment="content">
+    <section class="content-card">
+      <p class="eyebrow">Category</p>
+      <h1 th:text="${category.spec.displayName}">Category</h1>
+      <ul class="post-list">
+        <li th:each="post : ${posts.items}">
+          <a th:href="@{${post.status.permalink}}" th:text="${post.spec.title}">
+            Post
+          </a>
+        </li>
+      </ul>
+    </section>
+  </th:block>
+</html>

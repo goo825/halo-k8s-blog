@@ -1,0 +1,21 @@
+apiVersion: theme.halo.run/v1alpha1
+kind: Theme
+metadata:
+  name: halo-k8s-theme
+spec:
+  displayName: Halo K8s Theme
+  author:
+    name: goo825
+    website: "https://github.com/goo825"
+  description: Minimal Halo theme package for K8s and Jenkins CI/CD demos.
+  logo: "https://www.halo.run/logo"
+  homepage: "https://github.com/goo825/halo-k8s-blog"
+  repo: "https://github.com/goo825/halo-k8s-blog"
+  issues: "https://github.com/goo825/halo-k8s-blog/issues"
+  settingName: "halo-k8s-theme-setting"
+  configMapName: "halo-k8s-theme-config"
+  version: "0.2.0"
+  requires: ">=2.0.0"
+  license:
+    - name: "MIT"
+      url: "https://opensource.org/licenses/MIT"

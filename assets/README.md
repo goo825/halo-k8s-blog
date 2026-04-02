@@ -1,9 +1,11 @@
-This directory stores repository-managed static assets for the Halo blog.
+This directory stores repository-managed static files for experiments and references.
 
-During Jenkins deployment, the whole `assets/` directory is copied into:
+The current frontend publish path has moved to the Halo theme package under:
 
-`/root/.halo2/assets`
+`theme/halo-k8s-theme`
+
+Jenkins now publishes the theme package into:
+
+`/root/.halo2/themes/halo-k8s-theme`
 
 inside the running Halo pod.
-
-Add images, CSS, or other files here when you want Jenkins to publish them automatically.

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="https://www.thymeleaf.org"
+  th:replace="~{layout :: html(head = null,content = ~{::content})}"
+>
+  <th:block th:fragment="content">
+    <section class="content-card section-heading">
+      <div>
+        <p class="eyebrow">Recent publishing</p>
+        <h2>Latest posts</h2>
+      </div>
+      <p class="section-copy">
+        The list below is rendered by Halo and styled by the repository-managed
+        theme package.
+      </p>
+    </section>
+
+    <section class="post-grid">
+      <article class="post-card" th:each="post : ${posts.items}">
+        <p class="card-kicker">Post</p>
+        <h3>
+          <a th:href="@{${post.status.permalink}}" th:text="${post.spec.title}">
+            Sample post
+          </a>
+        </h3>
+        <p class="card-copy">
+          Open the article to view the full Halo content page rendered by this
+          theme.
+        </p>
+        <a class="text-link" th:href="@{${post.status.permalink}}">Read article</a>
+      </article>
+    </section>
+
+    <section class="content-card empty-state" th:if="${#lists.isEmpty(posts.items)}">
+      <h3>No posts yet</h3>
+      <p>
+        Publish your first Halo article and it will appear here automatically
+        after the theme is enabled.
+      </p>
+    </section>
+
+    <div class="pager content-card">
+      <a class="button button-secondary" th:if="${posts.hasPrevious()}" th:href="@{${posts.prevUrl}}">
+        Previous
+      </a>
+      <a class="button button-primary" th:if="${posts.hasNext()}" th:href="@{${posts.nextUrl}}">
+        Next
+      </a>
+    </div>
+  </th:block>
+</html>
