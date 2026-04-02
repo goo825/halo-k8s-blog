@@ -5,6 +5,7 @@ Kubernetes-based Halo blog system with Jenkins CI/CD.
 ## Structure
 
 - `Jenkinsfile`: Jenkins pipeline definition
+- `Jenkinsfile.monitoring`: monitoring pipeline definition
 - `theme/halo-k8s-theme`: repository-managed Halo theme package
 - `k8s/mysql`: MySQL manifests
 - `k8s/halo`: Halo manifests

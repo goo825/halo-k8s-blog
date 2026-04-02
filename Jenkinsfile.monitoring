@@ -1,0 +1,61 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Prepare Monitoring Namespace') {
+            steps {
+                sh '''
+                kubectl create namespace monitoring-system --dry-run=client -o yaml | kubectl apply -f -
+                '''
+            }
+        }
+
+        stage('Prepare Node03 Directories') {
+            steps {
+                sh '''
+                kubectl delete job -n monitoring-system monitoring-node03-prepare --ignore-not-found=true
+                kubectl apply -f k8s/monitoring/node03-prepare.yaml
+                kubectl wait --for=condition=complete job/monitoring-node03-prepare -n monitoring-system --timeout=120s
+                '''
+            }
+        }
+
+        stage('Deploy Monitoring Core') {
+            steps {
+                sh '''
+                kubectl apply -f k8s/monitoring/prometheus-grafana-node03.yaml
+                kubectl rollout status deployment/prometheus -n monitoring-system --timeout=180s
+                kubectl rollout status deployment/grafana -n monitoring-system --timeout=180s
+                '''
+            }
+        }
+
+        stage('Deploy Node Exporter') {
+            steps {
+                sh '''
+                kubectl apply -f k8s/monitoring/node-exporter.yaml
+                '''
+            }
+        }
+
+        stage('Deploy Kube State Metrics') {
+            steps {
+                sh '''
+                kubectl rollout status deployment/kube-state-metrics -n monitoring-system --timeout=180s || true
+                kubectl get pods -n monitoring-system -o wide
+                '''
+            }
+        }
+
+        stage('Show Access Info') {
+            steps {
+                sh '''
+                kubectl get svc -n monitoring-system
+                echo "Prometheus URL: http://10.0.0.103:30900"
+                echo "Grafana URL: http://10.0.0.103:30901"
+                echo "Grafana login: admin / admin"
+                '''
+            }
+        }
+    }
+}
