@@ -169,6 +169,21 @@ data:
         editable: true
 ---
 apiVersion: v1
+kind: Secret
+metadata:
+  name: grafana-smtp-secret
+  namespace: monitoring-system
+type: Opaque
+stringData:
+  GF_SMTP_ENABLED: "true"
+  GF_SMTP_HOST: "smtp.qq.com:465"
+  GF_SMTP_USER: "replace-with-your-qq-email"
+  GF_SMTP_PASSWORD: "replace-with-your-smtp-auth-code"
+  GF_SMTP_FROM_ADDRESS: "replace-with-your-qq-email"
+  GF_SMTP_FROM_NAME: "Grafana Alert"
+  GF_SMTP_SKIP_VERIFY: "true"
+---
+apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: prometheus-pv-node03
@@ -340,6 +355,9 @@ spec:
               value: admin
             - name: GF_SECURITY_ADMIN_PASSWORD
               value: admin
+          envFrom:
+            - secretRef:
+                name: grafana-smtp-secret
           ports:
             - containerPort: 3000
               name: web

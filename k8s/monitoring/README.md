@@ -15,6 +15,7 @@ This directory contains a lightweight monitoring stack for the three-node Halo K
 - `node-exporter.yaml`: DaemonSet and headless Service for node metrics
 - `node03-prepare.yaml`: one-shot Job that prepares `/data/prometheus` and `/data/grafana` on `k8s-master-03`
 - `prepare-node03.sh`: manual fallback script for preparing the `k8s-master-03` host directories
+- `grafana-smtp-secret.qq.example.yaml`: example QQ mail SMTP secret for Grafana email alerting
 - `Jenkinsfile.monitoring`: Jenkins pipeline for one-click monitoring deployment
 
 ## Access
@@ -41,6 +42,21 @@ Create a Jenkins pipeline job with:
 - Script Path: `Jenkinsfile.monitoring`
 
 Then click `Build Now` to deploy the full monitoring stack.
+
+## Grafana email alerting
+
+For email alerts, create or update the SMTP secret before restarting Grafana:
+
+```bash
+kubectl apply -f k8s/monitoring/grafana-smtp-secret.qq.example.yaml
+kubectl rollout restart deployment/grafana -n monitoring-system
+```
+
+After Grafana restarts, configure:
+
+- Contact point type: `Email`
+- Recipient: your mailbox
+- Alert rule: for example, CPU usage above `80%` for `5m`
 
 ## Default Grafana credentials
 
