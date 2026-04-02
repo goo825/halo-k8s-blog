@@ -24,6 +24,19 @@ pipeline {
         stage('Apply Stack') {
             steps {
                 sh '''
+                set -e
+                case "${RESOLVED_STACK_FILE}" in
+                  k8s/stacks/blog-stack-portable.yaml)
+                    kubectl delete svc halo -n blog-system --ignore-not-found=true
+                    ;;
+                  k8s/stacks/jenkins-stack-portable.yaml)
+                    kubectl delete svc jenkins -n cicd-system --ignore-not-found=true
+                    ;;
+                  k8s/stacks/monitoring-stack-portable.yaml)
+                    kubectl delete svc prometheus -n monitoring-system --ignore-not-found=true
+                    kubectl delete svc grafana -n monitoring-system --ignore-not-found=true
+                    ;;
+                esac
                 kubectl apply -f "${RESOLVED_STACK_FILE}"
                 '''
             }
