@@ -44,6 +44,7 @@ rules:
       - services
       - serviceaccounts
       - configmaps
+      - secrets
       - persistentvolumes
       - persistentvolumeclaims
     verbs: ["get", "list", "watch", "create", "update", "patch"]
@@ -51,7 +52,7 @@ rules:
     resources: ["pods/exec"]
     verbs: ["create"]
   - apiGroups: ["apps"]
-    resources: ["deployments", "daemonsets", "replicasets"]
+    resources: ["deployments", "daemonsets", "replicasets", "statefulsets"]
     verbs: ["get", "list", "watch", "create", "update", "patch"]
   - apiGroups: ["batch"]
     resources: ["jobs"]
